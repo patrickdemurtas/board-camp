@@ -90,7 +90,7 @@ export async function finalizeRent(req,res){
 try {
   const rental = await db.query(`SELECT * FROM rentals WHERE id=$1`, [id]);
 
-  if (rental.rows[0] === 0) return res.sendStatus(404);
+  if (rental.rowCount === 0) return res.sendStatus(404);
 
   if (rental.rows[0].returnDate) return res.sendStatus(400);
   
