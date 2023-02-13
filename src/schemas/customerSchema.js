@@ -7,7 +7,7 @@ export const customerSchema = Joi.object({
     birthday: Joi.string().regex(/^\d{4}-\d{2}-\d{2}$/).required(),
 })
 
-export const updateCustomerSchema = Joi.object({
+export const changeCustomerSchema = Joi.object({
     name: Joi.string().min(1),
     phone: Joi.string().min(10).max(11),
     cpf: Joi.string().length(11).regex(/^\d{11}$/),
