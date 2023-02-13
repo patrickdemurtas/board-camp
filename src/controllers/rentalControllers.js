@@ -1,4 +1,5 @@
 import { db, renTab, cusTab, gameTab } from "../database/database.connection.js";
+import dayjs from "dayjs";
 
 export async function deleteRent(req, res) {
 
@@ -82,4 +83,38 @@ export async function listRentals(req, res) {
 
 
 
-  
+export async function finalizeRent(req,res){
+    const { id } = req.params;
+
+    const returnDate = dayjs().format("YYYY-MM-DD");
+try {
+  const rental = await db.query(`SELECT * FROM rentals WHERE id=$1`, [id]);
+  if (!rental.rows[0]) {
+    return res.sendStatus(404);
+  }
+  if (rental.rows[0].returnDate) {
+    return res.sendStatus(400);
+  }
+  const expirationDate = dayjs(rental.rows[0].rentDate).add(
+    rental.rows[0].daysRented,
+    "day"
+  );
+  const difference = dayjs().diff(expirationDate, "day");
+  let delayFee;
+  if (difference > 0) {
+    delayFee = difference * (rental.rows[0].originalPrice / rental.rows[0].daysRented);
+  } else {
+    delayFee = null;
+  }
+
+  await db.query(
+    'UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE "id" = $3',
+    [returnDate, delayFee, id]
+  );
+
+  res.sendStatus(200);
+} catch (error) {
+  res.sendStatus(500);
+}
+
+}
