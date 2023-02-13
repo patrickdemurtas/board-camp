@@ -44,11 +44,11 @@ export async function insertRent(req,res){
     firstPrice = pricePerDay*daysRented;
 
     const checkCustomer = await db.query(`SELECT * FROM ${cusTab} WHERE id = $1`, [customerId]);
-    if(checkCustomer.rowCount === 0) return res.sendStatus(400);
+    if(checkCustomer.rows[0] === 0) return res.sendStatus(400);
     
     
     const checkGame = await db.query(`SELECT * FROM ${gameTab} WHERE id = $1`, [gameId]);
-    if(checkGame.rowCount === 0) return res.sendStatus(400);
+    if(checkGame.rows[0] === 0) return res.sendStatus(400);
 
 
     const gsRent = await db.query(`SELECT * FROM ${renTab} WHERE "gameId" = $1 AND "back" IS NULL`, [gameId]);
@@ -60,7 +60,7 @@ export async function insertRent(req,res){
     if(unavailableStock === true) return res.sendStatus(400);
 
 
-    await db.query(`INSERT INTO ${renTab} ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES ($1,$2,$3,$4,$5,$6,$7);`, [customerId, gameId, rDate, daysRented, back, firstPrice, delayFee]);
+    const r = await db.query(`INSERT INTO ${renTab} ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES ($1,$2,$3,$4,$5,$6,$7);`, [customerId, gameId, rDate, daysRented, back, firstPrice, delayFee]);
     res.sendStatus(201);
     
 
