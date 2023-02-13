@@ -11,3 +11,6 @@ const connection = {
 if (process.env.MODE === 'prod') connection.ssl = true;
 
 export const db = new Pool(connection);
+export const renTab = "rentals";
+export const cusTab = "customers";
+export const gameTab = "games";
