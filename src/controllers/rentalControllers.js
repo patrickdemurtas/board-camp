@@ -51,7 +51,7 @@ export async function insertRent(req,res){
     if(checkGame.rowCount === 0) return res.sendStatus(400);
 
 
-    const gsRent = await db.query(`SELECT * FROM ${gameTab} WHERE "gameId" = $1 AND "back" IS NULL`, [gameId]);
+    const gsRent = await db.query(`SELECT * FROM ${renTab} WHERE "gameId" = $1 AND "back" IS NULL`, [gameId]);
     const gStocked = checkGame.rows[0].stockTotal;
     const gRent = gsRent.rows.length;
 
