@@ -31,13 +31,12 @@ export async function listCustomerById(req, res) {
 
     try {
 
-        const costumerId = await db.query('SELECT * FROM costumers WHERE id = $1 LIMIT 1', [id]);
+        const customerId = await db.query('SELECT * FROM costumers WHERE id = $1 LIMIT 1', [id]);
 
-        if (costumerId.rowCount !== 0) {
-            return res.status(200).send(costumerId.rows[0]);
-
-        } else if (costumerId.rowCount === 0) {
+        if (customerId.rowCount === 0){
             return res.sendStatus(404);
+        } else{
+            return res.status(200).send(customerId.rows[0]);
         }
 
     } catch (error) {
