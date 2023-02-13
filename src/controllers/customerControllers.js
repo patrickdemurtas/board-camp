@@ -33,13 +33,9 @@ export async function listCustomerById(req, res) {
 
         const customerId = await db.query('SELECT * FROM customers WHERE id = $1 LIMIT 1', [id]);
 
-        if (customerId.rowCount !== 0) {
-            
-            return res.status(200).send(customerId.rows[0]);
+        if (customerId.rowCount === 0) return res.sendStatus(404)
 
-        } else {
-            return res.sendStatus(404);
-        }
+          return res.send(customerId.rows[0])       
 
     } catch (error) {
         return res.sendStatus(500);
