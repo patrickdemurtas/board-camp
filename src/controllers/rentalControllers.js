@@ -91,7 +91,7 @@ export async function finalizeRent(req,res) {
         `SELECT * FROM ${renTab} WHERE id = $1`,
         [id]
       );
-      if (!rentalData.rows.length) {
+      if (rentalData.rows.length === 0) {
         return res.sendStatus(404);
       }
       rental = rentalData.rows[0];
