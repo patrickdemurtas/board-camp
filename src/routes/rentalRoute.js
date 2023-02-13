@@ -10,8 +10,8 @@ rentalRoute.post('/rentals', );
 
 rentalRoute.get('/rentals', );
 
-rentalRoute.delete('/rentals/:id', );
+rentalRoute.delete('/rentals/:id', deleteRent);
 
-rentalRoute.put('/rentals/:id/return', deleteRent);
+rentalRoute.put('/rentals/:id/return',);
 
 export default rentalRoute;
