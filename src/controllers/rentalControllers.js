@@ -89,28 +89,24 @@ export async function finalizeRent(req,res){
     const returnDate = dayjs().format("YYYY-MM-DD");
 try {
   const rental = await db.query(`SELECT * FROM rentals WHERE id=$1`, [id]);
-  if (!rental.rows[0]) {
-    return res.sendStatus(404);
-  }
-  if (rental.rows[0].returnDate) {
-    return res.sendStatus(400);
-  }
-  const expirationDate = dayjs(rental.rows[0].rentDate).add(
+
+  if (rental.rows[0] === 0) return res.sendStatus(404);
+
+  if (rental.rows[0].returnDate) return res.sendStatus(400);
+  
+  const expDate = dayjs(rental.rows[0].rentDate).add(
     rental.rows[0].daysRented,
     "day"
   );
-  const difference = dayjs().diff(expirationDate, "day");
+  const dif = dayjs().diff(expDate, "day");
   let delayFee;
-  if (difference > 0) {
-    delayFee = difference * (rental.rows[0].originalPrice / rental.rows[0].daysRented);
+  if (dif > 0) {
+    delayFee = dif * (rental.rows[0].originalPrice / rental.rows[0].daysRented);
   } else {
     delayFee = null;
   }
 
-  await db.query(
-    'UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE "id" = $3',
-    [returnDate, delayFee, id]
-  );
+  await db.query('UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE "id" = $3', [returnDate, delayFee, id]);
 
   res.sendStatus(200);
 } catch (error) {
