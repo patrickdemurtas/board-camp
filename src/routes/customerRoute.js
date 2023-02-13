@@ -13,7 +13,7 @@ customerRoute.post('/customers', validateSchema(customerSchema), validateCpf, in
 
 customerRoute.get('/customers', listCustomers);
 
-customerRoute.get('customers/:id', listCustomerById);
+customerRoute.get('/customers/:id', listCustomerById);
 
 customerRoute.put('/customers/:id', validateSchema(changeCustomerSchema), changeCustomer); //atentar
 
