@@ -79,3 +79,49 @@ export async function listRentals(req, res) {
         res.sendStatus(500);
     }
 }
+
+export async function finalizeRent(req,res) {
+    const rentalID = req.params.id;
+    const today = new Date();
+    const returnDate = today.toISOString().split("T")[0];
+    let rentalData;
+    
+    try {
+      const rentalQuery = await db.query(
+        `SELECT * FROM ${renTab} WHERE id = $1`,
+        [rentalID]
+      );
+  
+      if (rentalQuery.rows.length === 0) {
+        return res.sendStatus(404);
+      }
+  
+      rentalData = rentalQuery.rows[0];
+  
+      if (rentalData.returnDate !== null) return res.sendStatus(400);
+      
+  
+      const rentStart = new Date(rentalData.rentDate);
+      const daysRented = rentalData.daysRented;
+      const returnTimestamp = new Date(returnDate);
+      const timeDiff = Math.abs(returnTimestamp.getTime() - rentStart.getTime());
+      const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      const delay = diffDays - daysRented;
+      let delayFee = 0;
+  
+      if (delay > 0) {
+        const gameQuery = await db.query(`SELECT * FROM ${gameTab} WHERE id = $1`, [rentalData.gameId]);
+  
+        const gameData = gameQuery.rows[0];
+        const pricePerDay = gameData.pricePerDay;
+        delayFee = delay * pricePerDay;
+      }
+  
+      const updatedRental = await db.query(`UPDATE ${renTab} SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`,[returnDate, delayFee, rentalID]);
+  
+      res.sendStatus(200);
+    } catch (error) {
+        res.sendStatus(500);
+    }
+  }
+  

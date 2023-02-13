@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteRent, insertRent, listRentals } from "../controllers/rentalControllers.js";
+import { deleteRent, insertRent, listRentals, finalizeRent } from "../controllers/rentalControllers.js";
 import { rentalSchema } from "../schemas/rentalSchema.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 
@@ -12,6 +12,6 @@ rentalRoute.get('/rentals', listRentals);
 
 rentalRoute.delete('/rentals/:id', deleteRent);
 
-rentalRoute.put('/rentals/:id/return',);
+rentalRoute.put('/rentals/:id/return', finalizeRent);
 
 export default rentalRoute;
