@@ -81,15 +81,15 @@ export async function listRentals(req, res) {
 }
 
 
-export const finalizeRent = async (req, res) => {
-    const rentalID = req.params.id;
+export async function finalizeRent(req,res) {
+    const { id } = req.params;
     const today = new Date().toISOString().split("T")[0];
     let rental;
   
     try {
       const rentalData = await db.query(
         `SELECT * FROM ${renTab} WHERE id = $1`,
-        [rentalID]
+        [id]
       );
       if (!rentalData.rows.length) {
         return res.sendStatus(404);
@@ -116,13 +116,13 @@ export const finalizeRent = async (req, res) => {
   
       await db.query(
         `UPDATE ${renTab} SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`,
-        [today, delayFee, rentalID]
+        [today, delayFee, id]
       );
   
-      res.status(200).send();
+      res.sendStatus(200);
 
     } catch (error) {
         res.sendStatus(500);
     }
-  };
+  }
   
