@@ -35,20 +35,20 @@ export async function insertRent(req, res) {
 
     try {
 
-        const game = await db.query(`SELECT * FROM ${gameTab} WHERE id = $1`, [gameId]);
+        const game = await db.query("SELECT * FROM games WHERE id = $1", [gameId]);
         if (!game.rows.length) {
             return res.sendStatus(400);
         }
         originalPrice = game.rows[0].pricePerDay * daysRented;
 
 
-        const customer = await db.query(`SELECT * FROM ${cusTab} WHERE id = $1`, [customerId]);
+        const customer = await db.query("SELECT * FROM customers WHERE id = $1", [customerId]);
         if (!customer.rows.length) {
             return res.sendStatus(400)
         }
 
 
-        const rentedGames = await db.query(`SELECT * FROM ${renTab} WHERE "gameId" = $1 AND "returnDate" IS NULL`, [gameId]);
+        const rentedGames = await db.query("SELECT * FROM rentals WHERE gameId = $1 AND returnDate IS NULL", [gameId]);
         const totalStock = game.rows[0].stockTotal;
         const rentedStock = rentedGames.rows.length;
         if (totalStock <= rentedStock) {
@@ -57,7 +57,7 @@ export async function insertRent(req, res) {
 
 
         const rental = await db.query(
-            `INSERT INTO ${renTab} ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES ($1, $2, $3, $4, $5, $6, $7);`,
+            "INSERT INTO rentals (customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee) VALUES ($1, $2, $3, $4, $5, $6, $7);",
             [customerId, gameId, rentalDate, daysRented, returnDate, originalPrice, lateFee]
         );
         res.sendStatus(201);
