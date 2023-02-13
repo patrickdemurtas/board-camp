@@ -12,6 +12,6 @@ rentalRoute.get('/rentals', listRentals);
 
 rentalRoute.delete('/rentals/:id', deleteRent);
 
-rentalRoute.put('/rentals/:id/return', finalizeRent);
+rentalRoute.post('/rentals/:id/return', finalizeRent);
 
 export default rentalRoute;

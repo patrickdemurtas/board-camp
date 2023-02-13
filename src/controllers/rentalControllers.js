@@ -114,7 +114,7 @@ export async function finalizeRent(req, res) {
         delayFee = delay * pricePerDay;
       }
   
-      const updatedRental = await db.query(`UPDATE ${renTab} SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`, [newReturnDate, delayFee, id]);
+      await db.query(`UPDATE ${renTab} SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`, [newReturnDate, delayFee, id]);
   
       return res.sendStatus(200);
 
