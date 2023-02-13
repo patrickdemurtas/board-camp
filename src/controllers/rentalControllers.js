@@ -71,10 +71,11 @@ export async function insertRent(req, res) {
 
 export async function listRentals(req, res) {
     try {
-         await db.query(
+        const queryResult = await db.query(
             `WITH join_table AS ( SELECT rentals.id, rentals."customerId", rentals."gameId", rentals."rentDate", rentals."daysRented", rentals."returnDate", rentals."originalPrice", rentals."delayFee", customers.id AS customer_id, customers.name AS customer_name, games.id AS game_id, games.name AS game_name FROM rentals JOIN customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id ) SELECT * FROM ( SELECT id, "customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee", json_build_object('id', customer_id, 'name', customer_name) AS customer, json_build_object('id', game_id, 'name', game_name) AS game FROM join_table ) join_table; `
         );
-        res.sendStatus(200);
+        
+        res.status(200).send(queryResult.rows);
     } catch (error) {
         res.sendStatus(500);
     }
