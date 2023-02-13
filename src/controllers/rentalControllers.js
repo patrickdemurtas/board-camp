@@ -80,48 +80,49 @@ export async function listRentals(req, res) {
     }
 }
 
-export async function finalizeRent(req,res) {
+
+export const finalizeRent = async (req, res) => {
     const rentalID = req.params.id;
-    const today = new Date();
-    const returnDate = today.toISOString().split("T")[0];
-    let rentalData;
-    
+    const today = new Date().toISOString().split("T")[0];
+    let rental;
+  
     try {
-      const rentalQuery = await db.query(
+      const rentalData = await db.query(
         `SELECT * FROM ${renTab} WHERE id = $1`,
         [rentalID]
       );
-  
-      if (rentalQuery.rows.length === 0) {
+      if (!rentalData.rows.length) {
         return res.sendStatus(404);
       }
+      rental = rentalData.rows[0];
+      if (rental.returnDate) {
+        return res.sendStatus(400);
+      }
   
-      rentalData = rentalQuery.rows[0];
-  
-      if (rentalData.returnDate !== null) return res.sendStatus(400);
-      
-  
-      const rentStart = new Date(rentalData.rentDate);
-      const daysRented = rentalData.daysRented;
-      const returnTimestamp = new Date(returnDate);
-      const timeDiff = Math.abs(returnTimestamp.getTime() - rentStart.getTime());
-      const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      const delay = diffDays - daysRented;
+      const rentalDuration = rental.daysRented;
+      const rentedOn = new Date(rental.rentDate);
+      const returnedOn = new Date(today);
+      const elapsedTime = Math.abs(returnedOn.getTime() - rentedOn.getTime());
+      const daysElapsed = Math.ceil(elapsedTime / (1000 * 3600 * 24));
+      const delay = daysElapsed - rentalDuration;
       let delayFee = 0;
-  
       if (delay > 0) {
-        const gameQuery = await db.query(`SELECT * FROM ${gameTab} WHERE id = $1`, [rentalData.gameId]);
-  
-        const gameData = gameQuery.rows[0];
-        const pricePerDay = gameData.pricePerDay;
+        const gameData = await db.query(`SELECT * FROM ${gameTab} WHERE id = $1`, [
+          rental.gameId,
+        ]);
+        const pricePerDay = gameData.rows[0].pricePerDay;
         delayFee = delay * pricePerDay;
       }
   
-      const updatedRental = await db.query(`UPDATE ${renTab} SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`,[returnDate, delayFee, rentalID]);
+      await db.query(
+        `UPDATE ${renTab} SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`,
+        [today, delayFee, rentalID]
+      );
   
-      res.sendStatus(200);
+      res.status(200).send();
+
     } catch (error) {
         res.sendStatus(500);
     }
-  }
+  };
   
