@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteRent, insertRent } from "../controllers/rentalControllers.js";
+import { deleteRent, insertRent, listRentals } from "../controllers/rentalControllers.js";
 import { rentalSchema } from "../schemas/rentalSchema.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 
@@ -8,7 +8,7 @@ const rentalRoute = Router();
 
 rentalRoute.post('/rentals', validateSchema(rentalSchema), insertRent);
 
-rentalRoute.get('/rentals', );
+rentalRoute.get('/rentals', listRentals);
 
 rentalRoute.delete('/rentals/:id', deleteRent);
 
